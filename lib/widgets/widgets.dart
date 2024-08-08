@@ -1,0 +1,1 @@
+export 'package:peliculas_prueba/widgets/movie_slider.dart';

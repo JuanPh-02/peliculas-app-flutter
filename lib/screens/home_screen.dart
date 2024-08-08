@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:peliculas_prueba/widgets/widgets.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -7,20 +8,20 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       // backgroundColor: Color(0xFF5086B2),
-      appBar: AppBar(
-        actions: [],
-        leading: Icon(
-          Icons.nightlight_outlined,
-          color: Colors.grey[200],
-        ),
-        backgroundColor: Colors.transparent,
-      ),
       backgroundColor: Colors.blue[400],
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              // padding: const EdgeInsets.all(30),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            backgroundColor: Colors.blue[400],
+            leading: Icon(
+              Icons.nightlight_outlined,
+              color: Colors.grey[200],
+            ),
+            // floating: false,
+            // pinned: true,
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 45),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -30,7 +31,7 @@ class HomeScreen extends StatelessWidget {
                     margin: EdgeInsets.only(top: 10),
                     // color: Colors.red,
                     width: 250,
-                    child: Text(
+                    child: const Text(
                       'Hello, what do you want to watch ?',
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
@@ -66,34 +67,37 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Contenedor de Películas
-            Expanded(
+          ),
+          SliverToBoxAdapter(
+            child: Expanded(
               child: ClipRRect(
                 borderRadius: BorderRadiusDirectional.only(
                   topStart: Radius.circular(30),
                   topEnd: Radius.circular(30),
                 ),
                 child: Container(
-                  padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
                   color: Color(0xFF232F3D),
-                  child: Column(
-                    children: [
-                      Row(
-                        
-                        children: [
-                          Text('RECOMMENDED FOR YOU'),
-                          Spacer(),
-                          TextButton(onPressed: () {}, child: Text('See all', style: TextStyle(color: Colors.grey),))
-                        ],
-                      )
-                    ],
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Column(
+                      children: [
+                        // Slider de Peliculas Recomendadas
+                        MovieSlider(title: 'RECOMMENDED FOR YOU'),
+
+                        // Slider de Peliculas Mejor Valoradas
+                        MovieSlider(title: 'TOP RATED'),
+                        // Slider de Peliculas Mejor Valoradas
+                        MovieSlider(title: 'TOP RATED'),
+                        // Slider de Peliculas Mejor Valoradas
+                        MovieSlider(title: 'TOP RATED')
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
