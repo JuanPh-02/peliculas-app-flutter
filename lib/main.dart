@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:peliculas_prueba/screens/screens.dart';
 
 void main() => runApp(const MyApp());
 
@@ -8,14 +9,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Material App',
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Material App Bar'),
-        ),
-        body: const Center(
-          child: Text('Hello World'),
-        ),
+      debugShowCheckedModeBanner: true,
+      title: 'Películas App',
+      initialRoute: 'home',
+      routes: {
+        'home': (_) => HomeScreen(),
+        'details': (_) => DetailsScreen()
+      },
+      theme: ThemeData.light().copyWith(
+        textTheme: TextTheme(bodyMedium: TextStyle(color: Colors.grey[200]))
       ),
     );
   }
