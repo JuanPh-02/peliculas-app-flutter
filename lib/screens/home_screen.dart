@@ -12,7 +12,7 @@ class HomeScreen extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            backgroundColor: Colors.blue[400],
+            backgroundColor: Colors.transparent,
             leading: Icon(
               Icons.nightlight_outlined,
               color: Colors.grey[200],
@@ -20,63 +20,62 @@ class HomeScreen extends StatelessWidget {
             // floating: false,
             // pinned: true,
           ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 45),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Texto Inicial
-                  Container(
-                    margin: EdgeInsets.only(top: 10),
-                    // color: Colors.red,
-                    width: 250,
-                    child: const Text(
-                      'Hello, what do you want to watch ?',
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                // Texto Inicial y barra de búsqueda
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 45),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Texto Inicial
+                      Container(
+                        margin: EdgeInsets.only(top: 10),
+                        // color: Colors.red,
+                        width: 250,
+                        child: const Text(
+                          'Hello, what do you want to watch ?',
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
 
-                  // Barra de búsqueda
-                  Container(
-                    padding: EdgeInsets.symmetric(vertical: 8, horizontal: 15),
-                    decoration: BoxDecoration(
-                      color: const Color(0x33FFFFFF),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    // height: 30,
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.search,
-                          color: Colors.grey[200],
+                      // Barra de búsqueda
+                      TextField(
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0x33FFFFFF),
+                          prefixIcon:
+                              Icon(Icons.search, color: Colors.grey[200]),
+                          hintText: 'Search',
+                          hintStyle: TextStyle(color: Colors.grey[200]),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 12),
                         ),
-                        Text(
-                          'Search',
-                        ),
-                      ],
-                    ),
+                        cursorColor: Colors.grey[800],
+                      ),
+                      SizedBox(
+                        height: 25,
+                      ),
+                      
+                    ],
                   ),
-                  SizedBox(
-                    height: 25,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadiusDirectional.only(
-                  topStart: Radius.circular(30),
-                  topEnd: Radius.circular(30),
                 ),
-                child: Container(
-                  color: Color(0xFF232F3D),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Color(0xFF232F3D),
+                    borderRadius: BorderRadiusDirectional.only(
+                      topStart: Radius.circular(30),
+                      topEnd: Radius.circular(30),
+                    ),
+                  ),
                   child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
                     child: Column(
@@ -94,7 +93,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
         ],
