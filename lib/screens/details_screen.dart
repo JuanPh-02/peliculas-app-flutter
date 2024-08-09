@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:peliculas_prueba/widgets/widgets.dart';
 
 class DetailsScreen extends StatelessWidget {
   const DetailsScreen({super.key});
@@ -18,6 +19,7 @@ class DetailsScreen extends StatelessWidget {
             delegate: SliverChildListDelegate([
               _TitleAndQualification(),
               _Overview(),
+              ActorsSlider(),
               _AdditionalInfo(),
             ]),
           ),
@@ -158,7 +160,7 @@ class _AdditionalInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+      padding: const EdgeInsets.fromLTRB(30, 5, 30, 15),
       child: Column(
         children: [
           Row(
