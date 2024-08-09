@@ -39,10 +39,13 @@ class _CustomAppBar extends StatelessWidget {
       expandedHeight: 250,
       floating: false,
       pinned: true,
-      leading: Icon(
-        Icons.arrow_back_rounded,
-        color: Colors.grey[200],
-        size: 30,
+      leading: IconButton(
+        icon: Icon(
+          Icons.arrow_back_rounded,
+          color: Colors.grey[200],
+          size: 30,
+        ),
+        onPressed: () => Navigator.of(context).pop(),
       ),
       actions: [
         IconButton(
@@ -63,7 +66,8 @@ class _CustomAppBar extends StatelessWidget {
           ),
           child: FadeInImage(
             placeholder: AssetImage('assets/img/no-image.png'),
-            image: NetworkImage('https://e00-marca.uecdn.es/assets/multimedia/imagenes/2018/04/13/15236117183294.jpg'),
+            image: NetworkImage(
+                'https://e00-marca.uecdn.es/assets/multimedia/imagenes/2018/04/13/15236117183294.jpg'),
             fit: BoxFit.cover,
           ),
         ),
