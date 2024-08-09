@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:peliculas_prueba/blocs/movie_bloc.dart';
 import 'package:peliculas_prueba/widgets/widgets.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<MovieBloc>().add(LoadMovies());
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Color(0xFF5086B2),
       backgroundColor: Colors.blue[400],
       body: CustomScrollView(
         slivers: [
@@ -31,7 +43,7 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       // Texto Inicial
                       Container(
-                        margin: EdgeInsets.only(top: 10),
+                        margin: const EdgeInsets.only(top: 10),
                         // color: Colors.red,
                         width: 250,
                         child: const Text(
@@ -40,7 +52,7 @@ class HomeScreen extends StatelessWidget {
                               fontSize: 24, fontWeight: FontWeight.w600),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
 
@@ -57,19 +69,19 @@ class HomeScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(30.0),
                             borderSide: BorderSide.none,
                           ),
-                          contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                          contentPadding:
+                              const EdgeInsets.symmetric(vertical: 12),
                         ),
                         cursorColor: Colors.grey[800],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 25,
                       ),
-                      
                     ],
                   ),
                 ),
                 Container(
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Color(0xFF232F3D),
                     borderRadius: BorderRadiusDirectional.only(
                       topStart: Radius.circular(30),
@@ -78,18 +90,51 @@ class HomeScreen extends StatelessWidget {
                   ),
                   child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
-                    child: Column(
-                      children: [
-                        // Slider de Peliculas Recomendadas
-                        MovieSlider(title: 'RECOMMENDED FOR YOU'),
-
-                        // Slider de Peliculas Mejor Valoradas
-                        MovieSlider(title: 'TOP RATED'),
-                        // Slider de Peliculas Mejor Valoradas
-                        MovieSlider(title: 'TOP RATED'),
-                        // Slider de Peliculas Mejor Valoradas
-                        MovieSlider(title: 'TOP RATED')
-                      ],
+                    child:
+                        // Slider de Peliculas Populares
+                        BlocBuilder<MovieBloc, MovieState>(
+                      builder: (context, state) {
+                        if (state is MovieLoaded) {
+                          return Column(
+                            children: [
+                              MovieSlider(
+                                movies: state.popularMovies,
+                                title: 'POPULAR MOVIES',
+                              ),
+                              // Slider de Peliculas Mejor Valoradas
+                              MovieSlider(
+                                movies: state.topRatedMovies,
+                                title: 'TOP RATED',
+                              ),
+                              // // Slider de Peliculas Mejor Valoradas
+                              // MovieSlider(title: 'TOP RATED'),
+                              // // Slider de Peliculas Mejor Valoradas
+                              // MovieSlider(title: 'TOP RATED')
+                            ],
+                          );
+                        } else if (state is MovieLoading) {
+                          return const SizedBox(
+                            width: double.infinity,
+                            height: 360,
+                            child: Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        } else if (state is MovieError) {
+                          return const SizedBox(
+                            width: double.infinity,
+                            height: 360,
+                            child: Center(
+                                child: Text('Oops, ha ocurrido un error')),
+                          );
+                        } else {
+                          return const SizedBox(
+                            width: double.infinity,
+                            height: 360,
+                            child: Center(child: Text('Algo ha salido mal!')),
+                          );
+                        }
+                      },
                     ),
                   ),
                 ),

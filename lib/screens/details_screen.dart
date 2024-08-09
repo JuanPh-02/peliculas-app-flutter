@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:peliculas_prueba/blocs/movie_bloc.dart';
+import 'package:peliculas_prueba/models/models.dart';
 import 'package:peliculas_prueba/widgets/widgets.dart';
 
 class DetailsScreen extends StatelessWidget {
@@ -7,20 +9,23 @@ class DetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Movie movie = ModalRoute.of(context)!.settings.arguments as Movie;
+    context.read<MovieBloc>().add(LoadMovieDetails(movie.id));
+
     return Scaffold(
       backgroundColor: const Color(0xFF232F3D),
       body: CustomScrollView(
         slivers: [
           // Imagen Superior Pelicula - App Bar
-          _CustomAppBar(),
+          _CustomAppBar(movie),
 
           // Información de la Película
           SliverList(
             delegate: SliverChildListDelegate([
-              _TitleAndQualification(),
-              _Overview(),
-              ActorsSlider(),
-              _AdditionalInfo(),
+              _TitleAndQualification(movie),
+              _Overview(movie),
+              CastingSlider(movie.id),
+              _AdditionalInfo(movie),
             ]),
           ),
         ],
@@ -30,45 +35,59 @@ class DetailsScreen extends StatelessWidget {
 }
 
 class _CustomAppBar extends StatelessWidget {
-  const _CustomAppBar({super.key});
+  final Movie movie;
+
+  const _CustomAppBar(this.movie);
 
   @override
   Widget build(BuildContext context) {
-    return SliverAppBar(
-      backgroundColor: Colors.transparent,
-      expandedHeight: 250,
-      floating: false,
-      pinned: true,
-      leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_rounded,
-          color: Colors.grey[200],
-          size: 30,
-        ),
-        onPressed: () => Navigator.of(context).pop(),
-      ),
-      actions: [
-        IconButton(
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        if (didPop) {
+          return;
+        }
+        context.read<MovieBloc>().add(LoadMovies());
+        Navigator.of(context).pop();
+      },
+      child: SliverAppBar(
+        backgroundColor: Colors.transparent,
+        expandedHeight: 250,
+        floating: false,
+        pinned: true,
+        leading: IconButton(
           icon: Icon(
-            Icons.favorite_border,
+            Icons.arrow_back_rounded,
             color: Colors.grey[200],
             size: 30,
           ),
-          onPressed: () {},
+          onPressed: () {
+            context.read<MovieBloc>().add(LoadMovies());
+            Navigator.of(context).pop();
+          },
         ),
-      ],
-      flexibleSpace: const FlexibleSpaceBar(
-        centerTitle: true,
-        titlePadding: EdgeInsets.zero,
-        background: ClipRRect(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(30),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.favorite_border,
+              color: Colors.grey[200],
+              size: 30,
+            ),
+            onPressed: () {},
           ),
-          child: FadeInImage(
-            placeholder: AssetImage('assets/img/no-image.png'),
-            image: NetworkImage(
-                'https://e00-marca.uecdn.es/assets/multimedia/imagenes/2018/04/13/15236117183294.jpg'),
-            fit: BoxFit.cover,
+        ],
+        flexibleSpace: FlexibleSpaceBar(
+          centerTitle: true,
+          titlePadding: EdgeInsets.zero,
+          background: ClipRRect(
+            borderRadius: const BorderRadius.vertical(
+              bottom: Radius.circular(30),
+            ),
+            child: FadeInImage(
+              placeholder: const AssetImage('assets/img/no-image.png'),
+              image: NetworkImage(movie.fullBackdropPath),
+              fit: BoxFit.cover,
+            ),
           ),
         ),
       ),
@@ -77,7 +96,9 @@ class _CustomAppBar extends StatelessWidget {
 }
 
 class _TitleAndQualification extends StatelessWidget {
-  const _TitleAndQualification({super.key});
+  final Movie movie;
+
+  const _TitleAndQualification(this.movie);
 
   @override
   Widget build(BuildContext context) {
@@ -89,13 +110,13 @@ class _TitleAndQualification extends StatelessWidget {
         children: [
           // Título de la Película
           Text(
-            'Título de la Película',
-            style: TextStyle(
+            movie.title,
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
 
@@ -104,13 +125,14 @@ class _TitleAndQualification extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Botón de ver
-              Container(
+              SizedBox(
                 width: 140,
                 child: ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey[600],
-                    padding: EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -126,15 +148,9 @@ class _TitleAndQualification extends StatelessWidget {
               ),
 
               // Barra de calificación
-              RatingBarIndicator(
-                rating: 3,
-                itemBuilder: (context, index) => const Icon(
-                  Icons.star,
-                  color: Colors.amber,
-                ),
-                itemCount: 5,
-                itemSize: 20.0,
-                direction: Axis.horizontal,
+              CustomRatingBar(
+                rating: movie.voteAverage,
+                itemSize: 20,
               ),
             ],
           ),
@@ -145,12 +161,16 @@ class _TitleAndQualification extends StatelessWidget {
 }
 
 class _Overview extends StatelessWidget {
+  final Movie movie;
+
+  const _Overview(this.movie);
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
       child: Text(
-        'In culpa excepteur laboris esse nostrud. Ut aliquip proident minim ut velit cupidatat quis irure ipsum tempor dolore quis quis. Id do qui nisi elit eu ea aliquip aute quis ex voluptate qui dolore deserunt. Exercitation pariatur et proident nisi ad ut nulla cillum officia adipisicing ad ea. Velit minim ut sunt non deserunt labore est minim.',
+        movie.overview,
         textAlign: TextAlign.justify,
         style: TextStyle(color: Colors.grey[400], height: 1.8),
       ),
@@ -159,7 +179,9 @@ class _Overview extends StatelessWidget {
 }
 
 class _AdditionalInfo extends StatelessWidget {
-  const _AdditionalInfo({super.key});
+  final Movie movie;
+
+  const _AdditionalInfo(this.movie);
 
   @override
   Widget build(BuildContext context) {
@@ -167,35 +189,63 @@ class _AdditionalInfo extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(30, 5, 30, 15),
       child: Column(
         children: [
-          Row(
-            children: [
-              Text(
-                'Studio',
-                style: TextStyle(fontWeight: FontWeight.bold, height: 1.8),
-              ),
-              SizedBox(width: 30),
-              Text('Walt Disney Picture, Pixar'),
-            ],
-          ),
-          Row(
-            children: [
-              Text(
-                'Genre',
-                style: TextStyle(fontWeight: FontWeight.bold, height: 1.8),
-              ),
-              SizedBox(width: 30),
-              Text('Animación, Familia, Aventura, Comedia'),
-            ],
-          ),
-          Row(
-            children: [
-              Text(
-                'Release',
-                style: TextStyle(fontWeight: FontWeight.bold, height: 1.8),
-              ),
-              SizedBox(width: 30),
-              Text('2024'),
-            ],
+          BlocBuilder<MovieBloc, MovieState>(
+            builder: (context, state) {
+              if (state is MovieDetailsLoaded) {
+                final detailsMovie = state.movie;
+                final genreNames = detailsMovie.genres
+                        ?.map((genre) => genre.name)
+                        .join(', ') ??
+                    'Géneros no disponibles.';
+
+                return Column(
+                  children: [
+                    Row(
+                      children: [
+                        const Text(
+                          'Studio',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, height: 1.8),
+                        ),
+                        const SizedBox(width: 30),
+                        Text(detailsMovie.studio ?? 'Desconocido'),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const Text(
+                          'Genres',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, height: 1.8),
+                        ),
+                        const SizedBox(width: 30),
+                        Text(genreNames),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const Text(
+                          'Release',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, height: 1.8),
+                        ),
+                        const SizedBox(width: 30),
+                        Text(movie.releaseDate),
+                      ],
+                    ),
+                  ],
+                );
+              } else if (state is MovieDetailsLoading) {
+                return Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: const Center(child: CircularProgressIndicator()),
+                );
+              } else if (state is MovieDetailsError) {
+                return Center(child: Text(state.message));
+              } else {
+                return const Center(child: Text('Algo ha salido mal!'));
+              }
+            },
           ),
         ],
       ),
