@@ -58,7 +58,7 @@ class Movie {
       studio:
           productionCompaniesJson != null && productionCompaniesJson.isNotEmpty
               ? productionCompaniesJson[0]['name'] as String?
-              : null,
+              : '',
       title: json["title"],
       voteAverage: json["vote_average"]?.toDouble(),
     );
