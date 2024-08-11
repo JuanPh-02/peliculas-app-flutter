@@ -175,7 +175,7 @@ class _Overview extends StatelessWidget {
       child: Text(
         movie.overview,
         textAlign: TextAlign.justify,
-        style: const TextStyle( height: 1.8),
+        style: const TextStyle(height: 1.8),
       ),
     );
   }
@@ -188,6 +188,8 @@ class _AdditionalInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(30, 5, 30, 15),
       child: Column(
@@ -214,17 +216,25 @@ class _AdditionalInfo extends StatelessWidget {
                         Text(detailsMovie.studio ?? 'Desconocido'),
                       ],
                     ),
+                    const SizedBox(height: 5,),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
                           'Genres',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                               fontWeight: FontWeight.bold, height: 1.8),
                         ),
                         const SizedBox(width: 30),
-                        Text(genreNames),
+                        Expanded(
+                          child: Text(genreNames),
+                        ),
                       ],
                     ),
+                    const SizedBox(height: 5,),
                     Row(
                       children: [
                         const Text(
