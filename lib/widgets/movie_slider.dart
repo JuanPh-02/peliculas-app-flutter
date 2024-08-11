@@ -5,14 +5,42 @@ import 'package:peliculas_prueba/widgets/widgets.dart';
 class MovieSlider extends StatefulWidget {
   final String? title;
   final List<Movie> movies;
+  final Function loadMoreData;
 
-  const MovieSlider({super.key, this.title, required this.movies});
+  const MovieSlider(
+      {super.key,
+      this.title,
+      required this.movies,
+      required this.loadMoreData});
 
   @override
   State<MovieSlider> createState() => _MovieSliderState();
 }
 
 class _MovieSliderState extends State<MovieSlider> {
+  final ScrollController scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    scrollController.addListener(() {
+      print('pixels: ' + scrollController.position.pixels.toStringAsFixed(0));
+      print('maxScroll: ' + scrollController.position.maxScrollExtent.toStringAsFixed(0));
+
+      if (scrollController.position.pixels >=
+          scrollController.position.maxScrollExtent - 500) {
+        print('Cargando mas ...');
+        widget.loadMoreData();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -43,6 +71,7 @@ class _MovieSliderState extends State<MovieSlider> {
           ),
           Expanded(
             child: ListView.builder(
+              controller: scrollController,
               scrollDirection: Axis.horizontal,
               key: PageStorageKey(widget.title),
               itemCount: widget.movies.length,

@@ -8,6 +8,12 @@ abstract class MovieEvent {}
 
 class LoadMovies extends MovieEvent {}
 
+class LoadMoreMovies extends MovieEvent {
+  final String category; // 'popular' o 'rated'
+
+  LoadMoreMovies(this.category);
+}
+
 class SearchMovies extends MovieEvent {
   final String query;
   SearchMovies(this.query);
@@ -58,52 +64,85 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
 
   List<Movie> popularMovies = [];
   List<Movie> topRatedMovies = [];
-  Map<int, String> genreMap = {};
+  int popularMoviesPage = 0;
+  int topRatedMoviesPage = 0;
 
   MovieBloc() : super(MovieInitial()) {
+    print("Movie Bloc activo");
+    on<LoadMovies>(_loadInitialMovies);
+    on<LoadMoreMovies>(_fetchMovies);
+    on<LoadMovieDetails>(_fetchMovieDetails);
+  }
 
-    on<LoadMovies>((event, emit) async {
-      // Verificar si ya hay películas cargadas
-      if (popularMovies.isNotEmpty) {
-        emit(MovieLoaded(popularMovies, topRatedMovies));
-        return;
+  Future<void> _loadInitialMovies(
+      LoadMovies event, Emitter<MovieState> emit) async {
+    // Verificar si ya hay películas cargadas
+    if (popularMovies.isNotEmpty && topRatedMovies.isNotEmpty) {
+      emit(MovieLoaded(popularMovies, topRatedMovies));
+      return;
+    }
+
+    emit(MovieLoading());
+    try {
+      await getPopularMovies();
+      await getTopRatedMovies();
+
+      emit(MovieLoaded(popularMovies, topRatedMovies));
+    } catch (error) {
+      emit(MovieError('Error al cargar las películas: ${error.toString()}'));
+    }
+  }
+
+  Future<void> _fetchMovies(
+      LoadMoreMovies event, Emitter<MovieState> emit) async {
+    emit(MovieLoading());
+    try {
+      if (event.category == 'popular') {
+        getPopularMovies();
+      } else if (event.category == 'rated') {
+        getTopRatedMovies();
       }
 
-      // Si no hay películas cargadas, cargar desde la API
-      emit(MovieLoading());
-      try {
-        final resultPopularMovies = await _tmdb.v3.movies.getPopular();
-        final resultTopRatedMovies = await _tmdb.v3.movies.getTopRated();
+      emit(MovieLoaded(popularMovies, topRatedMovies));
+    } catch (error) {
+      emit(MovieError('Error al cargar las películas: ${error.toString()}'));
+    }
+  }
 
-        final popularMoviesResponse =
-            MoviesResponse.fromJson(resultPopularMovies);
-        final topRatedResponse =
-            MoviesResponse.fromJson(resultTopRatedMovies);
+  getPopularMovies() async {
+    popularMoviesPage++;
+    print(popularMoviesPage);
+    final resultPopularMovies =
+        await _tmdb.v3.movies.getPopular(page: popularMoviesPage);
+    final popularMoviesResponse = MoviesResponse.fromJson(resultPopularMovies);
+    popularMovies.addAll(popularMoviesResponse.results);
+  }
 
-        popularMovies = [...popularMovies, ...popularMoviesResponse.results];
-        topRatedMovies = [...topRatedMovies, ...topRatedResponse.results];
+  getTopRatedMovies() async {
+    topRatedMoviesPage++;
+    print(topRatedMoviesPage);
+    final resultTopRatedMovies =
+        await _tmdb.v3.movies.getTopRated(page: topRatedMoviesPage);
+    final topRatedResponse = MoviesResponse.fromJson(resultTopRatedMovies);
+    topRatedMovies = [...topRatedMovies, ...topRatedResponse.results];
+    topRatedMovies.addAll(topRatedResponse.results);
+  }
 
-        emit(MovieLoaded(popularMovies, topRatedMovies));
-      } catch (error) {
-        emit(MovieError('Error al cargar las películas: ${error.toString()}'));
-      }
-    });
+  Future<void> _fetchMovieDetails(
+      LoadMovieDetails event, Emitter<MovieState> emit) async {
+    emit(MovieDetailsLoading());
+    try {
+      final result = await _tmdb.v3.movies.getDetails(event.movieId);
+      final credits = await _tmdb.v3.movies.getCredits(event.movieId);
 
-    on<LoadMovieDetails>((event, emit) async {
-      emit(MovieDetailsLoading());
-      try {
-        final result = await _tmdb.v3.movies.getDetails(event.movieId);
-        final credits = await _tmdb.v3.movies.getCredits(event.movieId);
+      final movieDetails = Movie.fromJson(result);
+      final casting =
+          List<Actor>.from(credits["cast"].map((x) => Actor.fromJson(x)));
 
-        final movieDetails = Movie.fromJson(result);
-        final casting =
-            List<Actor>.from(credits["cast"].map((x) => Actor.fromJson(x)));
-
-        emit(MovieDetailsLoaded(movieDetails, casting));
-      } catch (error) {
-        emit(MovieDetailsError(
-            'Error al cargar la película: ${error.toString()}'));
-      }
-    });
+      emit(MovieDetailsLoaded(movieDetails, casting));
+    } catch (error) {
+      emit(MovieDetailsError(
+          'Error al cargar la película: ${error.toString()}'));
+    }
   }
 }

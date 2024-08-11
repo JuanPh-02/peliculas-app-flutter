@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:peliculas_prueba/models/models.dart';
 
 class Movie {
-  String backdropPath;
+  String? backdropPath;
   List<Genre>? genres;
   int id;
   String originalTitle;
@@ -16,7 +16,7 @@ class Movie {
   double voteAverage;
 
   Movie({
-    required this.backdropPath,
+    this.backdropPath,
     this.genres,
     required this.id,
     required this.originalTitle,
@@ -45,7 +45,7 @@ class Movie {
         json["production_companies"] as List<dynamic>?;
 
     return Movie(
-      backdropPath: json["backdrop_path"],
+      backdropPath: json["backdrop_path"] ?? '',
       genres: genresJson.isNotEmpty
           ? List<Genre>.from(genresJson.map((x) => Genre.fromJson(x)))
           : null,

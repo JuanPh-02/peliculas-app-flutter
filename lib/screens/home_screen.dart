@@ -19,6 +19,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: Colors.blue[400],
       body: CustomScrollView(
@@ -81,6 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 Container(
+                  // height: size.height * 0.7,
                   decoration: const BoxDecoration(
                     color: Color(0xFF232F3D),
                     borderRadius: BorderRadiusDirectional.only(
@@ -90,33 +93,34 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
-                    child:
-                        // Slider de Peliculas Populares
-                        BlocBuilder<MovieBloc, MovieState>(
+                    child: BlocBuilder<MovieBloc, MovieState>(
                       builder: (context, state) {
                         if (state is MovieLoaded) {
                           return Column(
                             children: [
+                              // Slider de Peliculas Populares
                               MovieSlider(
                                 movies: state.popularMovies,
                                 title: 'POPULAR MOVIES',
+                                loadMoreData: () => context
+                                    .read<MovieBloc>()
+                                    .add(LoadMoreMovies('popular')),
                               ),
                               // Slider de Peliculas Mejor Valoradas
                               MovieSlider(
                                 movies: state.topRatedMovies,
                                 title: 'TOP RATED',
+                                loadMoreData: () => context
+                                    .read<MovieBloc>()
+                                    .add(LoadMoreMovies('rated')),
                               ),
-                              // // Slider de Peliculas Mejor Valoradas
-                              // MovieSlider(title: 'TOP RATED'),
-                              // // Slider de Peliculas Mejor Valoradas
-                              // MovieSlider(title: 'TOP RATED')
                             ],
                           );
                         } else if (state is MovieLoading) {
-                          return const SizedBox(
+                          return SizedBox(
                             width: double.infinity,
-                            height: 360,
-                            child: Center(
+                            height: size.height * 0.7,
+                            child: const Center(
                               child: CircularProgressIndicator(),
                             ),
                           );

@@ -47,8 +47,8 @@ class _CustomAppBar extends StatelessWidget {
         if (didPop) {
           return;
         }
-        context.read<MovieBloc>().add(LoadMovies());
         Navigator.of(context).pop();
+        context.read<MovieBloc>().add(LoadMovies());
       },
       child: SliverAppBar(
         backgroundColor: Colors.transparent,
@@ -62,8 +62,8 @@ class _CustomAppBar extends StatelessWidget {
             size: 30,
           ),
           onPressed: () {
-            context.read<MovieBloc>().add(LoadMovies());
             Navigator.of(context).pop();
+            context.read<MovieBloc>().add(LoadMovies());
           },
         ),
         actions: [

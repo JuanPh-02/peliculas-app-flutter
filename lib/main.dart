@@ -35,8 +35,6 @@ class MyApp extends StatelessWidget {
         'home': (_) => const HomeScreen(),
         'details': (_) => const DetailsScreen()
       },
-      // initialRoute: 'home',
-      // routes: {'home': (_) => HomeScreen(), 'details': (_) => DetailsScreen()},
       theme: ThemeData.light().copyWith(
           textTheme: TextTheme(bodyMedium: TextStyle(color: Colors.grey[200]))),
     );
