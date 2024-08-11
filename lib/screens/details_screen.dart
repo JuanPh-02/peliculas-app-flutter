@@ -12,8 +12,11 @@ class DetailsScreen extends StatelessWidget {
     final Movie movie = ModalRoute.of(context)!.settings.arguments as Movie;
     context.read<MovieBloc>().add(LoadMovieDetails(movie.id));
 
+    final theme = Theme.of(context);
+    print(theme.cardColor);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF232F3D),
+      backgroundColor: theme.cardColor,
       body: CustomScrollView(
         slivers: [
           // Imagen Superior Pelicula - App Bar
@@ -172,7 +175,7 @@ class _Overview extends StatelessWidget {
       child: Text(
         movie.overview,
         textAlign: TextAlign.justify,
-        style: TextStyle(color: Colors.grey[400], height: 1.8),
+        style: const TextStyle( height: 1.8),
       ),
     );
   }

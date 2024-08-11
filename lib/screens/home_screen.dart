@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:peliculas_prueba/blocs/cubit/theme_cubit_cubit.dart';
 import 'package:peliculas_prueba/blocs/movie_bloc.dart';
 import 'package:peliculas_prueba/widgets/widgets.dart';
 
@@ -19,20 +20,32 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeCubit = context.watch<ThemeCubit>();
+    final theme = Theme.of(context);
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Colors.blue[400],
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             backgroundColor: Colors.transparent,
-            leading: Icon(
-              Icons.nightlight_outlined,
-              color: Colors.grey[200],
+            leading: IconButton(
+              icon: themeCubit.state.isDarkMode
+                  ? Icon(
+                      Icons.sunny,
+                      // color: Colors.grey[200],
+                      size: 26,
+                    )
+                  : Icon(
+                      Icons.nightlight_outlined,
+                      // color: Colors.grey[200],
+                      size: 26,
+                    ),
+              onPressed: () {
+                themeCubit.toggleTheme();
+              },
             ),
-            // floating: false,
-            // pinned: true,
           ),
           SliverList(
             delegate: SliverChildListDelegate(
@@ -46,7 +59,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       // Texto Inicial
                       Container(
                         margin: const EdgeInsets.only(top: 10),
-                        // color: Colors.red,
                         width: 250,
                         child: const Text(
                           'Hello, what do you want to watch ?',
@@ -62,11 +74,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       TextField(
                         decoration: InputDecoration(
                           filled: true,
-                          fillColor: const Color(0x33FFFFFF),
+                          fillColor: theme.focusColor,
                           prefixIcon:
-                              Icon(Icons.search, color: Colors.grey[200]),
+                              const Icon(Icons.search),
                           hintText: 'Search',
-                          hintStyle: TextStyle(color: Colors.grey[200]),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30.0),
                             borderSide: BorderSide.none,
@@ -84,9 +95,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 Container(
                   // height: size.height * 0.7,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF232F3D),
-                    borderRadius: BorderRadiusDirectional.only(
+                  decoration: BoxDecoration(
+                    color: theme.cardColor,
+                    borderRadius: const BorderRadiusDirectional.only(
                       topStart: Radius.circular(30),
                       topEnd: Radius.circular(30),
                     ),
@@ -125,17 +136,17 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           );
                         } else if (state is MovieError) {
-                          return const SizedBox(
+                          return SizedBox(
                             width: double.infinity,
-                            height: 360,
-                            child: Center(
+                            height: size.height * 0.7,
+                            child: const Center(
                                 child: Text('Oops, ha ocurrido un error')),
                           );
                         } else {
-                          return const SizedBox(
+                          return SizedBox(
                             width: double.infinity,
-                            height: 360,
-                            child: Center(child: Text('Algo ha salido mal!')),
+                            height: size.height * 0.7,
+                            child: const Center(child: Text('Algo ha salido mal!')),
                           );
                         }
                       },

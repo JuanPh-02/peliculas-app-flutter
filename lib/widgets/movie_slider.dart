@@ -61,7 +61,6 @@ class _MovieSliderState extends State<MovieSlider> {
                       onPressed: () {},
                       child: const Text(
                         'See all',
-                        style: TextStyle(color: Colors.grey),
                       ))
                 ],
               ),
